@@ -4,237 +4,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Arry no Uta</title>
-    <link rel="stylesheet" href="styles.css" />
-    <style>
-      @font-face {
-        font-family: "Champagne & Limousines";
-        src: url("Resources/Champagne & Limousines.ttf") format("truetype");
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Champagne & Limousines", sans-serif;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        background-color: #303841;
-        color: #d6d6d6;
-        text-align: center;
-      }
-
-      header {
-        background: #d6d6d6;
-        padding: 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: fixed;
-        width: 100%;
-        top: 0;
-        z-index: 1000;
-        box-shadow: #1a202c;
-      }
-
-      header h2 a {
-        text-decoration: none;
-        color: #303841;
-        padding-left: 200px;
-      }
-
-      nav {
-        padding-right: 200px;
-      }
-
-      nav ul {
-        list-style: none;
-        display: flex;
-      }
-
-      nav ul li {
-        margin: 0 15px;
-      }
-
-      nav ul li a {
-        text-decoration: none;
-        color: #303841;
-        font-weight: bold;
-      }
-
-      @keyframes fadeDrop {
-        from {
-          opacity: 0;
-          transform: translateY(-50px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .hero {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background: url("Resources/Home_panel.jpg") no-repeat center
-          center/cover;
-        padding-top: 80px;
-        opacity: 0;
-        transform: translateY(-50px);
-        animation: fadeDrop 500ms ease-out forwards;
-
-        position: relative;
-        transition: left 0.3s ease;
-      }
-
-      .hero img {
-        width: 750px;
-      }
-
-      .hero p {
-        margin-top: 5px;
-        width: 60%;
-        text-align: center;
-        font-size: 18px;
-        letter-spacing: 4px;
-        line-height: 1.6;
-        color: #d6d6d6;
-      }
-
-      .covers {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        padding: 340px 40px;
-        background: #303841;
-        flex-wrap: wrap;
-      }
-
-      .cover-item {
-        background: #1a202c;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        max-width: 300px;
-        opacity: 0;
-        transform: translateY(20px);
-        animation: fadeIn 150ms ease-out forwards;
-      }
-
-      .cover-item img {
-        width: 100%;
-        height: auto;
-        object-fit: cover;
-      }
-
-      .cover-item:nth-child(1) {
-        animation-delay: 1000ms;
-      }
-      .cover-item:nth-child(2) {
-        animation-delay: 1300ms;
-      }
-      .cover-item:nth-child(3) {
-        animation-delay: 1600ms;
-      }
-
-      .cover-item h3,
-      .cover-item p {
-        opacity: 0;
-        animation: fadeIn 150ms ease-out forwards;
-        margin-top: 20px;
-        color: #d6d6d6;
-      }
-
-      .cover-item:nth-child(1) h3,
-      .cover-item:nth-child(1) p {
-        animation-delay: 1600ms;
-      }
-      .cover-item:nth-child(2) h3,
-      .cover-item:nth-child(2) p {
-        animation-delay: 1900ms;
-      }
-      .cover-item:nth-child(3) h3,
-      .cover-item:nth-child(3) p {
-        animation-delay: 2200ms;
-      }
-
-      .commission-section {
-        background: #1a202c;
-        padding: 360px 0;
-        text-align: center;
-        background-image: url("Resources/Commission_panel.jpg");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-      }
-
-      .commission-section h2 {
-        color: #d6d6d6;
-        font-size: 40px;
-        margin-bottom: 20px;
-      }
-
-      .commission-section a {
-        display: inline-block;
-        background: #d6d6d6;
-        color: #1a202c;
-        padding: 10px 30px;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 20px;
-      }
-
-      .commission-section a:hover{
-        background: #303841;
-        color: #d6d6d6;
-      }
-
-      .credits {
-        text-align: center;
-        padding: 20px;
-        background: #1a202c;
-        color: #d6d6d6;
-        font-size: 14px;
-        letter-spacing: 2px;
-        margin-top: 40px;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <header>
       <h2>
-        <a href="https://www.youtube.com/@arrynouta" target="_blank"
-          >Arry no Uta</a
-        >
+          <a href="https://www.youtube.com/@arrynouta" target="_blank">Arry no Uta</a>
       </h2>
+      <div class="menu-toggle">&#9776;</div>
       <nav>
-        <ul>
-          <li><a href="#home" class="active">Home</a></li>
-          <li><a href="#about">About Me</a></li>
-          <li><a href="#covers">Covers</a></li>
-          <li><a href="#commissions">Commissions</a></li>
-        </ul>
+          <ul>
+              <li><a href="#home" class="active">Home</a></li>
+              <li><a href="#about">About Me</a></li>
+              <li><a href="#covers">Covers</a></li>
+              <li><a href="#commissions">Commissions</a></li>
+          </ul>
       </nav>
-    </header>
+  </header>
+  <script>
+      document.querySelector('.menu-toggle').addEventListener('click', function() {
+          document.querySelector('nav ul').classList.toggle('show');
+      });
+  </script>
 
     <section id="home" class="hero">
       <img src="Resources/Arry no Uta.png" alt="Arry no Uta" />
