@@ -212,7 +212,7 @@ nav ul li a {
 
 @media (max-width: 960px) {
   .hero {
-    background-position-x: -1015px;
+    background-position: calc(70% - 100px) center;
   }
 
   .hero img {
