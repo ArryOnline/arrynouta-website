@@ -93,7 +93,7 @@ nav ul li a {
   transform: translateY(-50px);
   animation: fadeDrop 500ms ease-out forwards;
 
-  position: relative;
+  background-position: calc(100%) right;
   transition: left 0.3s ease;
 }
 
@@ -212,7 +212,7 @@ nav ul li a {
 
 @media (max-width: 960px) {
   .hero {
-    background-position: calc(70% - 100px) center;
+    background-position: calc(75%) center;
   }
 
   .hero img {
