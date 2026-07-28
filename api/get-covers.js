@@ -1,24 +1,35 @@
 // api/get-covers.js
 
 function parseCreditLine(description, keywordPattern) {
+  // Regex mencari format: Label - Nama (atau Label : Nama)
   const regex = new RegExp(`${keywordPattern}\\s*[:\\-=]\\s*([^\\r\\n]+)`, "i");
   const match = description.match(regex);
 
   if (match && match[1]) {
-    let name = match[1].trim();
+    let rawName = match[1].trim();
 
-    if (name.toLowerCase().includes("arry") || name.toLowerCase().includes("alarik")) {
+    // Dapatkan nama bersih, buang label jika tersisa
+    let cleanName = rawName
+      .replace(/^(mix|master|mixing|video|edited|movie|illustration|vocal|vocals)\b/gi, "")
+      .replace(/^[\s:\-=&]+/g, "") // Hapus sisa titik dua, strip, ampersand di awal
+      .trim();
+
+    // Jika mengandung kata "Arry" atau "Alarik", atau hasilnya kosong/hanya simbol -> return "Arry"
+    if (
+      !cleanName ||
+      cleanName.toLowerCase().includes("arry") ||
+      cleanName.toLowerCase().includes("alarik") ||
+      cleanName.toLowerCase() === "mix" ||
+      cleanName.toLowerCase() === "master"
+    ) {
       return "Arry";
     }
 
-    const forbiddenLabels = ["vocal", "vocals", "singer", "mix", "master", "video", "edited", "movie"];
-    const isOnlyLabel = forbiddenLabels.some((label) => name.toLowerCase() === label);
-
-    if (name.length > 0 && !isOnlyLabel) {
-      return name;
-    }
+    // Kalau ditemukan nama lain yang valid (misal: "Okami Ken"), kembalikan nama tersebut
+    return cleanName;
   }
 
+  // Fallback default jika tidak ada pencocokan
   return "Arry";
 }
 
@@ -55,7 +66,7 @@ export default async function handler(req, res) {
       const description = video.snippet.description || "";
       const thumbnails = video.snippet.thumbnails;
 
-      // Bersihkan judul dari teks " | 【Cover by Arry】", "- Cover by Arry", dll.
+      // Clean Title
       let rawTitle = video.snippet.title;
       let cleanTitle = rawTitle
         .replace(/\|\s*【Cover by Arry】/gi, "")
@@ -67,7 +78,7 @@ export default async function handler(req, res) {
         id: video.id,
         title: cleanTitle,
         thumbnail: thumbnails.maxres ? thumbnails.maxres.url : thumbnails.high.url,
-        vocalsBy: "Arry", // Dibuat statis jadi Arry
+        vocalsBy: "Arry", // Statis Arry
         mixBy: parseCreditLine(description, "(Mix & Master|Mix/Master|Mix and Master|Mix|Mixing)"),
         videoBy: parseCreditLine(description, "(Video|Movie|Edited|Illustration)"),
       };
