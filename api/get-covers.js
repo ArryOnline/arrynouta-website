@@ -1,26 +1,30 @@
 // api/get-covers.js
 
 function parseCreditLine(description, keywordPattern) {
-  // Regex yang lebih presisi: mencari kata kunci (misal "Vocals" atau "Mix & Master") 
-  // diikuti tanda hubung/titik dua, lalu mengambil namanya sampai akhir baris
+  // Regex: mencari kata kunci disusul simbol (- / : / =)
   const regex = new RegExp(`${keywordPattern}\\s*[:\\-=]\\s*([^\\r\\n]+)`, "i");
   const match = description.match(regex);
-  
+
   if (match && match[1]) {
     let name = match[1].trim();
 
-    // Jika mengandung kata "Arry" atau "Alarik", seragamkan jadi "Arry"
+    // 1. Jika ada kata "Arry" atau "Alarik", langsung return "Arry"
     if (name.toLowerCase().includes("arry") || name.toLowerCase().includes("alarik")) {
       return "Arry";
     }
-    
-    // Cegah bug jika regex tidak sengaja menangkap teks label itu sendiri
-    if (name.length > 0 && !name.toLowerCase().includes("mix") && !name.toLowerCase().includes("video")) {
+
+    // 2. Daftar kata label yang HARUS DIBUANG agar tidak sengaja terpanggil sebagai nama
+    const forbiddenLabels = ["vocal", "vocals", "singer", "mix", "master", "video", "edited", "movie"];
+    const isOnlyLabel = forbiddenLabels.some((label) => name.toLowerCase() === label);
+
+    // Jika teks yang didapat BUKAN cuma kata label, kembalikan nama tersebut (misal: "Okami Ken")
+    if (name.length > 0 && !isOnlyLabel) {
       return name;
     }
   }
 
-  return "Arry"; // Default fallback jika tidak ditemukan di deskripsi
+  // Fallback default jika tidak ada nama lain yang valid
+  return "Arry";
 }
 
 export default async function handler(req, res) {
@@ -32,10 +36,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1. Ambil video terbaru DENGAN FILTER videoDuration=medium & long (Abaikan Shorts)
-    // - videoDuration 'medium': 4 menit hingga 20 menit
-    // - videoDuration 'long': lebih dari 20 menit
-    // Kita panggil search untuk video kategori umum, lalu filter durasi
     const searchUrl = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=10&type=video`;
     const searchRes = await fetch(searchUrl);
     const searchData = await searchRes.json();
@@ -46,22 +46,17 @@ export default async function handler(req, res) {
 
     const initialVideoIds = searchData.items.map((item) => item.id.videoId).join(",");
 
-    // 2. Ambil detail video untuk memeriksa durasi persisnya (contentDetails) & deskripsi (snippet)
     const detailUrl = `https://www.googleapis.com/youtube/v3/videos?key=${YOUTUBE_API_KEY}&id=${initialVideoIds}&part=snippet,contentDetails`;
     const detailRes = await fetch(detailUrl);
     const detailData = await detailRes.json();
 
-    // 3. Filter out YouTube Shorts (Shorts biasanya berdurasi <= 60 detik / 1 menit)
+    // Filter Longform (Abaikan Shorts)
     const longFormVideos = detailData.items.filter((video) => {
-      const durationStr = video.contentDetails.duration; // Format ISO 8601 (misal: PT3M45S)
-      
-      // Jika durasinya hanya "PT45S" atau "PT1M" tanpa menit panjang, kemungkinan besar Shorts.
-      // Cek sederhana: jika durasinya memiliki format 'M' (menit) dan bukan sekadar 60s, itu longform.
-      const hasMinutes = durationStr.includes("M");
-      return hasMinutes; 
-    }).slice(0, 3); // Ambil 3 terkini yang sudah difilter
+      const durationStr = video.contentDetails.duration;
+      return durationStr.includes("M"); 
+    }).slice(0, 3);
 
-    // 4. Olah data kredits
+    // Olah Data
     const covers = longFormVideos.map((video) => {
       const description = video.snippet.description || "";
       const thumbnails = video.snippet.thumbnails;
@@ -70,14 +65,13 @@ export default async function handler(req, res) {
         id: video.id,
         title: video.snippet.title,
         thumbnail: thumbnails.maxres ? thumbnails.maxres.url : thumbnails.high.url,
-        // Pattern disesuaikan dengan variasi penulisan umum di deskripsi
-        vocalsBy: parseCreditLine(description, "(Vocal|Vocals|Singer)"),
+        // Pattern pencarian deskripsi
+        vocalsBy: parseCreditLine(description, "(Vocal|Vocals|Singer|Vokal)"),
         mixBy: parseCreditLine(description, "(Mix & Master|Mix/Master|Mix and Master|Mix|Mixing)"),
         videoBy: parseCreditLine(description, "(Video|Movie|Edited|Illustration)"),
       };
     });
 
-    // 5. Header Cache Vercel
     res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate");
     return res.status(200).json(covers);
 
