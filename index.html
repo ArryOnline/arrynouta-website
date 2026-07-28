@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -30,6 +30,46 @@
       <p>Music Covers & Mixing Commission</p>
     </section>
 
+    <!-- ABOUT ME SECTION -->
+    <section id="about" class="about-section">
+      <h2>About Me</h2>
+      <div class="social-chips">
+        
+        <!-- YouTube -->
+        <div class="chip-wrapper animate-on-scroll">
+          <a href="https://www.youtube.com/@arrynouta" target="_blank" class="social-chip">
+            <img src="Resources/youtube.png" alt="YouTube" class="chip-logo" />
+            <span class="chip-text">Arry no Uta</span>
+          </a>
+        </div>
+
+        <!-- Instagram -->
+        <div class="chip-wrapper animate-on-scroll">
+          <a href="https://www.instagram.com/alarikmn" target="_blank" class="social-chip">
+            <img src="Resources/instagram.png" alt="Instagram" class="chip-logo" />
+            <span class="chip-text">@alarikmn</span>
+          </a>
+        </div>
+
+        <!-- X / Twitter -->
+        <div class="chip-wrapper animate-on-scroll">
+          <a href="https://x.com/ArryNoUta" target="_blank" class="social-chip">
+            <img src="Resources/x.png" alt="X" class="chip-logo" />
+            <span class="chip-text">@ArryNoUta</span>
+          </a>
+        </div>
+
+        <!-- TikTok -->
+        <div class="chip-wrapper animate-on-scroll">
+          <a href="https://www.tiktok.com/@alarikmn" target="_blank" class="social-chip">
+            <img src="Resources/tiktok.png" alt="TikTok" class="chip-logo" />
+            <span class="chip-text">@alarikmn</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
     <!-- COVERS SECTION -->
     <section id="covers" class="covers">
       <p id="loadingCovers">Loading video...</p>
@@ -48,9 +88,7 @@
           </div>
 
           <div class="form-group">
-            <label for="songDuration"
-              >Durasi Lagu (Kurang dari / menit):</label
-            >
+            <label for="songDuration">Durasi Lagu (Kurang dari / menit):</label>
             <input
               type="number"
               id="songDuration"
@@ -83,8 +121,8 @@
           <h3>Detail & Rules:</h3>
           <ul>
             <li>
-              <strong>Solo:</strong> 125k | <strong>Duo:</strong>
-              210k | <strong>Group:</strong> Duo + 100k/vokalis.
+              <strong>Solo:</strong> 125k | <strong>Duo:</strong> 210k |
+              <strong>Group:</strong> Duo + 100k/vokalis.
             </li>
             <li>
               <strong>Free Includes:</strong> 1 main track, 2 backing tracks, 2
@@ -95,7 +133,8 @@
               25k/menit).
             </li>
             <li>
-              <strong>Extra Track:</strong> +50k/track & +1 hari per 2 extra track.
+              <strong>Extra Track:</strong> +50k/track & +1 hari per 2 extra
+              track.
             </li>
             <li>
               <strong>Estimasi Dasar:</strong> Solo/Duo = 5 hari. Vokalis
@@ -212,7 +251,7 @@
 
       // Event Listener
       const inputs = document.querySelectorAll(
-        "#commissions input, #commissions select"
+        "#commissions input, #commissions select",
       );
       inputs.forEach((input) => {
         input.addEventListener("change", calculateCommission);
@@ -259,10 +298,10 @@
           document.querySelectorAll(".animate-on-scroll").forEach((el) => {
             observer.observe(el);
           });
-
         } catch (err) {
           console.error(err);
-          coversSection.innerHTML = "<p>Idk, there should be a few covers here.</p>";
+          coversSection.innerHTML =
+            "<p>Idk what happened, there should be a few covers here.</p>";
         }
       }
 
