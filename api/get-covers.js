@@ -1,29 +1,24 @@
 // api/get-covers.js
 
 function parseCreditLine(description, keywordPattern) {
-  // Regex: mencari kata kunci disusul simbol (- / : / =)
   const regex = new RegExp(`${keywordPattern}\\s*[:\\-=]\\s*([^\\r\\n]+)`, "i");
   const match = description.match(regex);
 
   if (match && match[1]) {
     let name = match[1].trim();
 
-    // 1. Jika ada kata "Arry" atau "Alarik", langsung return "Arry"
     if (name.toLowerCase().includes("arry") || name.toLowerCase().includes("alarik")) {
       return "Arry";
     }
 
-    // 2. Daftar kata label yang HARUS DIBUANG agar tidak sengaja terpanggil sebagai nama
     const forbiddenLabels = ["vocal", "vocals", "singer", "mix", "master", "video", "edited", "movie"];
     const isOnlyLabel = forbiddenLabels.some((label) => name.toLowerCase() === label);
 
-    // Jika teks yang didapat BUKAN cuma kata label, kembalikan nama tersebut (misal: "Okami Ken")
     if (name.length > 0 && !isOnlyLabel) {
       return name;
     }
   }
 
-  // Fallback default jika tidak ada nama lain yang valid
   return "Arry";
 }
 
@@ -56,17 +51,23 @@ export default async function handler(req, res) {
       return durationStr.includes("M"); 
     }).slice(0, 3);
 
-    // Olah Data
     const covers = longFormVideos.map((video) => {
       const description = video.snippet.description || "";
       const thumbnails = video.snippet.thumbnails;
 
+      // Bersihkan judul dari teks " | 【Cover by Arry】", "- Cover by Arry", dll.
+      let rawTitle = video.snippet.title;
+      let cleanTitle = rawTitle
+        .replace(/\|\s*【Cover by Arry】/gi, "")
+        .replace(/-\s*Cover by Arry/gi, "")
+        .replace(/【Cover by Arry】/gi, "")
+        .trim();
+
       return {
         id: video.id,
-        title: video.snippet.title,
+        title: cleanTitle,
         thumbnail: thumbnails.maxres ? thumbnails.maxres.url : thumbnails.high.url,
-        // Pattern pencarian deskripsi
-        vocalsBy: parseCreditLine(description, "(Vocal|Vocals|Singer|Vokal)"),
+        vocalsBy: "Arry", // Dibuat statis jadi Arry
         mixBy: parseCreditLine(description, "(Mix & Master|Mix/Master|Mix and Master|Mix|Mixing)"),
         videoBy: parseCreditLine(description, "(Video|Movie|Edited|Illustration)"),
       };
