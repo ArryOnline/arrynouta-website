@@ -23,79 +23,251 @@
         </ul>
       </nav>
     </header>
+
+    <!-- HERO SECTION -->
+    <section id="home" class="hero animate-on-scroll">
+      <img src="Resources/Arry no Uta.png" alt="Arry no Uta" />
+      <p>Music Covers & Mixing Commission</p>
+    </section>
+
+    <!-- COVERS SECTION -->
+    <section id="covers" class="covers">
+      <p id="loadingCovers">Loading video...</p>
+    </section>
+
+    <!-- COMMISSIONS SECTION (CALCULATOR) -->
+    <section id="commissions" class="commission-section animate-on-scroll">
+      <h2>Commission Pricing Calculator</h2>
+
+      <div class="calculator-container">
+        <!-- Form Input -->
+        <div class="calc-form">
+          <div class="form-group">
+            <label for="vocalCount">Jumlah Vokalis:</label>
+            <input type="number" id="vocalCount" min="1" value="1" />
+          </div>
+
+          <div class="form-group">
+            <label for="songDuration"
+              >Durasi Lagu (Kurang dari / menit):</label
+            >
+            <input
+              type="number"
+              id="songDuration"
+              step="0.5"
+              min="0.5"
+              value="3.5"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="extraTracks"
+              >Extra Track (+50k / track & +1 hari / 2 track):</label
+            >
+            <input type="number" id="extraTracks" min="0" value="0" />
+          </div>
+
+          <div class="form-group">
+            <label for="quickerDays"
+              >Rush Order (+50k / Dipercepat 1 Hari):</label
+            >
+            <select id="quickerDays">
+              <option value="0">Tidak (Normal)</option>
+              <option value="1">Ya (+1 Hari Lebih Cepat)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Detail / Rules -->
+        <div class="calc-details">
+          <h3>Detail & Rules:</h3>
+          <ul>
+            <li>
+              <strong>Solo:</strong> 125k | <strong>Duo:</strong>
+              210k | <strong>Group:</strong> Duo + 100k/vokalis.
+            </li>
+            <li>
+              <strong>Free Includes:</strong> 1 main track, 2 backing tracks, 2
+              harmony tracks (per vokalis).
+            </li>
+            <li>
+              <strong>Durasi Maksimal:</strong> 5 menit 30 detik (Selebihnya +
+              25k/menit).
+            </li>
+            <li>
+              <strong>Extra Track:</strong> +50k/track & +1 hari per 2 extra track.
+            </li>
+            <li>
+              <strong>Estimasi Dasar:</strong> Solo/Duo = 5 hari. Vokalis
+              tambahan +1 hari / 2 vokalis.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Live Output -->
+        <div class="calc-result">
+          <div class="result-box">
+            <span>Total Estimasi Harga:</span>
+            <h3 id="totalPrice">Rp 125.000</h3>
+          </div>
+          <div class="result-box">
+            <span>Estimasi Pengerjaan:</span>
+            <h3 id="totalDays">5 Hari</h3>
+          </div>
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLSf7V9r7-svscOr9RsI9rZvDROH_jk31eWX6WaoccYfGgMHL3A/viewform?usp=sharing"
+            target="_blank"
+            class="order-btn"
+            >Order via Form</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="credits">
+      <p>Art by @832faa</p>
+      <p>All rights reserved</p>
+    </footer>
+
+    <!-- SCRIPTS -->
     <script>
+      // 1. Menu Toggle (Mobile)
       document
         .querySelector(".menu-toggle")
         .addEventListener("click", function () {
           document.querySelector("nav ul").classList.toggle("show");
         });
+
+      // 2. Intersection Observer (Scroll Animation)
+      const observerOptions = {
+        threshold: 0.1,
+      };
+
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animated");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll(".animate-on-scroll").forEach((el) => {
+        observer.observe(el);
+      });
+
+      // 3. Calculator Logic
+      function calculateCommission() {
+        const vocalCount =
+          parseInt(document.getElementById("vocalCount").value) || 1;
+        const duration =
+          parseFloat(document.getElementById("songDuration").value) || 0;
+        const extraTracks =
+          parseInt(document.getElementById("extraTracks").value) || 0;
+        const quickerDays =
+          parseInt(document.getElementById("quickerDays").value) || 0;
+
+        let price = 0;
+        let days = 5; // Base duration = 5 hari
+
+        // Hitung Harga & Hari dasar dari Vokalis
+        if (vocalCount === 1) {
+          price += 125000;
+        } else if (vocalCount === 2) {
+          price += 210000;
+        } else if (vocalCount > 2) {
+          price += 210000 + (vocalCount - 2) * 100000;
+        }
+
+        // Tambah hari jika vokalis > 2 (+1 hari / 2 vokalis tambahan)
+        if (vocalCount > 2) {
+          const extraVocalists = vocalCount - 2;
+          days += Math.ceil(extraVocalists / 2);
+        }
+
+        // Durasi lebih dari 5.5 menit (5m 30s)
+        if (duration > 5.5) {
+          const extraMinutes = Math.ceil(duration - 5.5);
+          price += extraMinutes * 25000;
+        }
+
+        // Extra Tracks (Gabungan biaya +50k per track & waktu +1 hari per 2 track)
+        if (extraTracks > 0) {
+          price += extraTracks * 50000;
+          days += Math.ceil(extraTracks / 2);
+        }
+
+        // Rush Order (Max mempercepat 1 hari)
+        if (quickerDays > 0) {
+          price += 50000;
+          days -= 1;
+        }
+
+        // Output ke UI
+        document.getElementById("totalPrice").innerText =
+          "Rp " + price.toLocaleString("id-ID");
+        document.getElementById("totalDays").innerText = days + " Hari";
+      }
+
+      // Event Listener
+      const inputs = document.querySelectorAll(
+        "#commissions input, #commissions select"
+      );
+      inputs.forEach((input) => {
+        input.addEventListener("change", calculateCommission);
+        input.addEventListener("input", calculateCommission);
+      });
+
+      // Run on startup
+      calculateCommission();
+
+      // New shit
+      async function loadCovers() {
+        const coversSection = document.getElementById("covers");
+
+        try {
+          // Memanggil Vercel Serverless Function milik kita sendiri
+          const response = await fetch("/api/get-covers");
+          const covers = await response.json();
+
+          if (!covers || covers.length === 0) {
+            coversSection.innerHTML = "<p>Tidak ada video ditemukan.</p>";
+            return;
+          }
+
+          coversSection.innerHTML = ""; // Bersihkan teks loading
+
+          covers.forEach((video) => {
+            const coverHtml = `
+              <div class="cover-item animate-on-scroll">
+                <a href="https://youtu.be/${video.id}" target="_blank">
+                  <img src="${video.thumbnail}" alt="${video.title}" />
+                </a>
+                <h3>${video.title}</h3>
+                <p>
+                  Performed by ${video.vocalsBy}<br />
+                  Mixed and Mastered by ${video.mixBy}<br />
+                  Edited by ${video.videoBy}
+                </p>
+              </div>
+            `;
+            coversSection.insertAdjacentHTML("beforeend", coverHtml);
+          });
+
+          // Jalankan ulang observer scroll animation untuk elemen baru
+          document.querySelectorAll(".animate-on-scroll").forEach((el) => {
+            observer.observe(el);
+          });
+
+        } catch (err) {
+          console.error(err);
+          coversSection.innerHTML = "<p>Idk, there should be a few covers here.</p>";
+        }
+      }
+
+      // Jalankan saat web dimuat
+      loadCovers();
     </script>
-
-    <section id="home" class="hero">
-      <img src="Resources/Arry no Uta.png" alt="Arry no Uta" />
-      <p>Music Covers & Mixing Commission</p>
-    </section>
-
-    <section id="covers" class="covers">
-      <div class="cover-item">
-        <a
-          href="https://youtu.be/9GoMuHSfzS4?si=LkLi_JcTZHGngYAZ"
-          target="_blank"
-        >
-          <img
-            src="https://img.youtube.com/vi/9GoMuHSfzS4/maxresdefault.jpg"
-            alt="Catch the Moment"
-          />
-        </a>
-        <h3>LiSA - Catch the Moment</h3>
-        <p>
-          Performed by Arry<br />Mixed and Mastered by Arry<br />Edited by Arry
-        </p>
-      </div>
-      <div class="cover-item">
-        <a
-          href="https://youtu.be/HeG5SZZ4BAE?si=M6DeRKXmia1yoO6r"
-          target="_blank"
-        >
-          <img
-            src="https://img.youtube.com/vi/HeG5SZZ4BAE/maxresdefault.jpg"
-            alt="Ao no Sumika"
-          />
-        </a>
-        <h3>Tatsuya Kitani - Ao no Sumika</h3>
-        <p>
-          Performed by Arry<br />Mixed and Mastered by Arry<br />Edited by Arry
-        </p>
-      </div>
-      <div class="cover-item">
-        <a
-          href="https://youtu.be/lEFbaoO3iGU?si=jFYWGLmvxMRfSZu3"
-          target="_blank"
-        >
-          <img
-            src="https://img.youtube.com/vi/lEFbaoO3iGU/maxresdefault.jpg"
-            alt="Cry Baby"
-          />
-        </a>
-        <h3>Official HIGE DANdism - Cry Baby</h3>
-        <p>
-          Performed by Arry<br />Mixed and Mastered by Arry<br />Edited by Arry
-        </p>
-      </div>
-    </section>
-
-    <section id="commissions" class="commission-section">
-      <h2>Commission</h2>
-      <a
-        href="https://docs.google.com/forms/d/e/1FAIpQLSf7V9r7-svscOr9RsI9rZvDROH_jk31eWX6WaoccYfGgMHL3A/viewform?usp=sharing"
-        target="_blank"
-        >Fill Form</a
-      >
-    </section>
-
-    <footer class="credits">
-      <p>Art by @832faa</p>
-      <p>All rights reserved</p>
-    </footer>
   </body>
 </html>
